@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 public class DirectionalJoint : MonoBehaviour
 {
     [SerializeField]
-    private Rigidbody _connectedBody = null;
+    private GameObject _connectedBody = null;
 
     [SerializeField]
     private Vector3 _anchor = Vector3.zero;
@@ -31,6 +31,8 @@ public class DirectionalJoint : MonoBehaviour
     private float _maxLengthRatio = 1f;
 
     private Rigidbody _rb = null;
+
+    private Rigidbody _connectedRb = null;
 
     private Vector3 _initialDistance = Vector3.zero;
 
@@ -84,6 +86,11 @@ public class DirectionalJoint : MonoBehaviour
         _initialLength = _initialDistance.magnitude;
         _minLength = _initialLength * _minLengthRatio;
         _maxLength = _initialLength * _maxLengthRatio;
+
+        if (null !=_connectedBody)
+        {
+            _connectedRb = _connectedBody.GetComponent<Rigidbody>();
+        }
     }
 
     // Update is called once per frame
@@ -108,9 +115,9 @@ public class DirectionalJoint : MonoBehaviour
         else
         {
             _rb.AddForceAtPosition(springDelta * _spring, anchorPosition());
-            if (null != _connectedBody)
+            if (null != _connectedRb)
             {
-                _connectedBody.AddForceAtPosition(-springDelta * _spring, connectedAnchorPosition());
+                _connectedRb.AddForceAtPosition(-springDelta * _spring, connectedAnchorPosition());
             }
         }
     }

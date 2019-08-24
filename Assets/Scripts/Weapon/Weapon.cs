@@ -6,24 +6,19 @@ using UnityEngine.Assertions;
 public class Weapon : MonoBehaviour
 {
     [SerializeField]
-    private float _fireDelay = 2f;
-
-    [SerializeField]
     private float _maxDistance = 50f;
 
     [SerializeField]
     private LayerMask _layerMask = default;
 
     [SerializeField]
-    private GameObject _projectile = null;
+    private ParticleSystem _projectile = null;
 
     [SerializeField]
     private Transform _cam = null;
 
     [SerializeField]
     private float _rotationSlerpRate = 2f;
-
-    private float _fireTimer = 0f;
 
     public void OnDrawGizmos()
     {
@@ -48,7 +43,13 @@ public class Weapon : MonoBehaviour
             {
                 if ((null != hit.collider) && (hit.collider.CompareTag("Target")))
                 {
-                    transform.LookAt(hit.point);
+                    Vector3 targetPos = hit.point;
+                    Rigidbody hitRb = hit.collider.GetComponent<Rigidbody>();
+                    if (null != hitRb)
+                    {
+                        targetPos += hitRb.velocity * (Vector3.Distance(hit.point, transform.position) / _projectile.main.startSpeed.constant);
+                    }
+                    transform.LookAt(targetPos);
                     hasTarget = true;
                 }
             }
@@ -59,9 +60,7 @@ public class Weapon : MonoBehaviour
             }
         }
 
-        _fireTimer = Mathf.Max(0f, _fireTimer - Time.deltaTime);
-
-        if ((0f == _fireTimer) && hasTarget)
+        if (hasTarget)
         {
             RaycastHit hit;
 
@@ -69,8 +68,10 @@ public class Weapon : MonoBehaviour
             {
                 if ((null != hit.collider) && (hit.collider.CompareTag("Target")))
                 {
-                    Instantiate(_projectile, transform.position, transform.rotation);
-                    _fireTimer = _fireDelay;
+                    if (!_projectile.isPlaying)
+                    {
+                        _projectile.Play();
+                    }
                 }
             }
         }
