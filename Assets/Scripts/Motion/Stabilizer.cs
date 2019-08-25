@@ -69,7 +69,7 @@ public class Stabilizer : MonoBehaviour
                 Gizmos.color = Color.blue;
                 break;
         }
-        Gizmos.DrawLine(transform.position, transform.position + (transform.TransformDirection(_stabilizationDirection) / 2f));
+        Gizmos.DrawLine(transform.position, transform.position + (_stabilizationDirection / 2f));
     }
 
     // Start is called before the first frame update
@@ -82,7 +82,16 @@ public class Stabilizer : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (Mathf.Abs(Vector3.Angle(transform.TransformDirection(_stabilizationDirection), GetAxis())) > _breakAngle)
+        Vector3 axisVector = transform.TransformDirection(GetAxis());
+        float angleDiff = Mathf.Abs(Vector3.Angle(axisVector, _stabilizationDirection));
+
+        // The math breaks down when the angle difference is exactly 90 degrees which can happen when something is laying on a surface
+        if (Mathf.Approximately(angleDiff, 90f) || Mathf.Approximately(angleDiff, 180f) || Mathf.Approximately(angleDiff, 270f))
+        {
+            axisVector = transform.TransformDirection(GetAxis() + new Vector3(0.01f, 0.01f, 0.01f)).normalized;
+        }
+
+        if (angleDiff > _breakAngle)
         {
             Destroy(this);
         }
@@ -90,7 +99,7 @@ public class Stabilizer : MonoBehaviour
         {
             // Torque is a Vector3 where the vector direction is the axis of rotation and the magnitude is the angular acceleration (in radian / sec^2)
             // To get the direction of the torque, we need to get the cross product of the local and world up vectors, as the result will be perpendicular to both
-            Vector3 rotationalAxis = Vector3.Cross(transform.TransformDirection(_stabilizationDirection), GetAxis());
+            Vector3 rotationalAxis = Vector3.Cross(axisVector, _stabilizationDirection);
 
             // The acceleration rate should depend on how far we are from the correct rotation, we can get the angle difference from the cross product
             float theta = Mathf.Asin(rotationalAxis.magnitude);
@@ -103,6 +112,7 @@ public class Stabilizer : MonoBehaviour
             Quaternion q = transform.rotation * _rb.inertiaTensorRotation;
             delta = q * Vector3.Scale(_rb.inertiaTensor, (Quaternion.Inverse(q) * angularAcc));
 
+            // The math should not break down, since the edge cases ate handled with an added perturbance, but just in case
             if (!float.IsNaN(delta.x) && !float.IsNaN(delta.y) && !float.IsNaN(delta.z))
             {
                 _rb.AddTorque(delta * _strength);
