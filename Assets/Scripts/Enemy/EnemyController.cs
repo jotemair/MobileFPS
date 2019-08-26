@@ -16,6 +16,9 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private float _pushPointRatio = 0f;
 
+    [SerializeField]
+    private Material _deadMat = null;
+
     private Stabilizer _bodyStabilizer = null;
     private Stabilizer _bodyLookStabilizer = null;
 
@@ -29,10 +32,34 @@ public class EnemyController : MonoBehaviour
 
     private Vector3 _directionVector = Vector3.zero;
 
+    private bool _isAlive = true;
+
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
         Gizmos.DrawLine(_body.transform.TransformPoint(new Vector3(0f, _pushPointRatio, 0f)), _body.transform.TransformPoint(new Vector3(0f, _pushPointRatio, 0f)) + _directionVector);
+    }
+
+    private void Die()
+    {
+        if (_isAlive)
+        {
+            Destroy(_headStabilizer);
+            Destroy(_headLookStabilizer);
+            Destroy(_bodyLookStabilizer);
+            _bodyStabilizer.Strength = -3f;
+            _bodyStabilizer.BreakAngle = 25f;
+
+            _body.GetComponent<Rigidbody>().mass = _body.GetComponent<Rigidbody>().mass / 3f;
+            _head.GetComponent<Rigidbody>().mass = _head.GetComponent<Rigidbody>().mass / 3f;
+
+            _body.GetComponent<Renderer>().material = _deadMat;
+            _head.GetComponent<Renderer>().material = _deadMat;
+
+            _isAlive = false;
+        }
+
+        return;
     }
 
     // Start is called before the first frame update
@@ -54,11 +81,7 @@ public class EnemyController : MonoBehaviour
     {
         if (null == _neck)
         {
-            Destroy(_headStabilizer);
-            Destroy(_headLookStabilizer);
-            Destroy(_bodyLookStabilizer);
-            _bodyStabilizer.Strength = -3f;
-            _bodyStabilizer.BreakAngle = 25f;
+            Die();
         }
         else if (null != _target)
         {

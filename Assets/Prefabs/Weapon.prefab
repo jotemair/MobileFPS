@@ -136,12 +136,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95113ad0fc2837840af3059efa81b223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxDistance: 50
+  _maxDistance: Infinity
   _layerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 311
   _projectile: {fileID: 3381160532407849610}
-  _cam: {fileID: 455756195650135244}
+  _cam: {fileID: 0}
   _rotationSlerpRate: 2
 --- !u!1 &1390015231171413357
 GameObject:
@@ -3705,7 +3705,7 @@ ParticleSystem:
     serializedVersion: 3
     type: 1
     collisionMode: 0
-    colliderForce: 5
+    colliderForce: 150
     multiplyColliderForceByParticleSize: 0
     multiplyColliderForceByParticleSpeed: 1
     multiplyColliderForceByCollisionAngle: 1
