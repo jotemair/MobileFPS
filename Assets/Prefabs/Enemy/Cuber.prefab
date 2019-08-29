@@ -1,5 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2617423982532741454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1401484546265968610}
+  - component: {fileID: 5271760873103263559}
+  m_Layer: 11
+  m_Name: Mind
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1401484546265968610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2617423982532741454}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -5.2, z: 0}
+  m_LocalScale: {x: 2.5, y: 3.333333, z: 2.5}
+  m_Children: []
+  m_Father: {fileID: 7724278997486278512}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!195 &5271760873103263559
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2617423982532741454}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 0
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &7724278997193584677
 GameObject:
   m_ObjectHideFlags: 0
@@ -10,7 +63,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7724278997193584679}
   - component: {fileID: 7724278997193584678}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Cuber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -47,10 +100,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _body: {fileID: 7724278997807126931}
   _head: {fileID: 7724278997486278520}
-  _force: 1000
+  _force: 700
   _pushPointRatio: -0.2
   _deadMat: {fileID: 2100000, guid: d1f716d655503ff4e984f77926053e67, type: 2}
   _target: {fileID: 0}
+  _agent: {fileID: 5271760873103263559}
+  _avoidTreshold: 0.1
 --- !u!1 &7724278997486278520
 GameObject:
   m_ObjectHideFlags: 0
@@ -67,7 +122,7 @@ GameObject:
   - component: {fileID: 7724278997486278523}
   - component: {fileID: 7724278997486278522}
   - component: {fileID: 7724278997486278521}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Head
   m_TagString: Target
   m_Icon: {fileID: 0}
@@ -84,7 +139,8 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0.65, z: 0}
   m_LocalScale: {x: 0.4, y: 0.3, z: 0.4}
-  m_Children: []
+  m_Children:
+  - {fileID: 1401484546265968610}
   m_Father: {fileID: 7724278997193584679}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -198,6 +254,7 @@ MonoBehaviour:
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 1, z: 0}
   _axis: 1
+  _stabilizationAxisLock: 3
 --- !u!114 &7724278997486278521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,6 +271,7 @@ MonoBehaviour:
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 0, z: 1}
   _axis: 2
+  _stabilizationAxisLock: 3
 --- !u!1 &7724278997807126931
 GameObject:
   m_ObjectHideFlags: 0
@@ -229,7 +287,7 @@ GameObject:
   - component: {fileID: 7724278997807126934}
   - component: {fileID: 7724278997807126933}
   - component: {fileID: 7724278997807126932}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Body
   m_TagString: Target
   m_Icon: {fileID: 0}
@@ -340,6 +398,7 @@ MonoBehaviour:
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 1, z: 0}
   _axis: 1
+  _stabilizationAxisLock: 3
 --- !u!114 &7724278997807126932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,7 +411,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddb083e8f22df814e8beef3737fd7e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _strength: 20
+  _strength: 25
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 0, z: 1}
   _axis: 2
+  _stabilizationAxisLock: 1

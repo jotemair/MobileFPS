@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
@@ -30,6 +31,12 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private GameObject _target = null;
 
+    [SerializeField]
+    private NavMeshAgent _agent = null;
+
+    [SerializeField]
+    private float _avoidTreshold = 0.5f;
+
     private Vector3 _directionVector = Vector3.zero;
 
     private bool _isAlive = true;
@@ -40,10 +47,23 @@ public class EnemyController : MonoBehaviour
         Gizmos.DrawLine(_body.transform.TransformPoint(new Vector3(0f, _pushPointRatio, 0f)), _body.transform.TransformPoint(new Vector3(0f, _pushPointRatio, 0f)) + _directionVector);
     }
 
+    public void OnDrawGizmosSelected()
+    {
+        if (null != _agent)
+        {
+            Gizmos.color = Color.magenta;
+            for (int i = 0; i < _agent.path.corners.Length - 1; i++)
+            {
+                Gizmos.DrawLine(_agent.path.corners[i], _agent.path.corners[i + 1]);
+            }
+        }
+    }
+
     private void Die()
     {
         if (_isAlive)
         {
+            Destroy(_agent.gameObject);
             Destroy(_headStabilizer);
             Destroy(_headLookStabilizer);
             Destroy(_bodyLookStabilizer);
@@ -66,12 +86,12 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         var bodyStabilizers = _body.GetComponents<Stabilizer>();
-        _bodyStabilizer = ((StabilizationAxes.Z == bodyStabilizers[0].Axis) ? bodyStabilizers[1] : bodyStabilizers[0]);
-        _bodyLookStabilizer = ((StabilizationAxes.Z == bodyStabilizers[0].Axis) ? bodyStabilizers[0] : bodyStabilizers[1]);
+        _bodyStabilizer = ((Stabilizer.Axes.Z == bodyStabilizers[0].Axis) ? bodyStabilizers[1] : bodyStabilizers[0]);
+        _bodyLookStabilizer = ((Stabilizer.Axes.Z == bodyStabilizers[0].Axis) ? bodyStabilizers[0] : bodyStabilizers[1]);
 
         var headStabilizers = _head.GetComponents<Stabilizer>();
-        _headStabilizer = ((StabilizationAxes.Z == headStabilizers[0].Axis) ? headStabilizers[1] : headStabilizers[0]);
-        _headLookStabilizer = ((StabilizationAxes.Z == headStabilizers[0].Axis) ? headStabilizers[0] : headStabilizers[1]);
+        _headStabilizer = ((Stabilizer.Axes.Z == headStabilizers[0].Axis) ? headStabilizers[1] : headStabilizers[0]);
+        _headLookStabilizer = ((Stabilizer.Axes.Z == headStabilizers[0].Axis) ? headStabilizers[0] : headStabilizers[1]);
 
         _neck = _head.GetComponent<DirectionalJoint>();
     }
@@ -85,10 +105,22 @@ public class EnemyController : MonoBehaviour
         }
         else if (null != _target)
         {
-            _directionVector = (_target.transform.position - _body.transform.position);
-            _directionVector = new Vector3(_directionVector.x, 0f, _directionVector.z).normalized;
-            _bodyLookStabilizer.StabilizationDirection = _directionVector;
-            _headLookStabilizer.StabilizationDirection = _directionVector;
+            _agent.SetDestination(_target.transform.position);
+
+            float avoidDist = Vector3.Scale(_agent.transform.localPosition, Vector3.right + Vector3.forward).magnitude;
+
+            if ((avoidDist < _avoidTreshold) && (_agent.path.corners.Length > 1))
+            {
+                _directionVector = (_agent.path.corners[1] - _body.transform.position);
+                _directionVector = new Vector3(_directionVector.x, 0f, _directionVector.z).normalized;
+                _bodyLookStabilizer.StabilizationDirection = _directionVector;
+                _headLookStabilizer.StabilizationDirection = _directionVector;
+            }
+            else
+            {
+                _directionVector = Vector3.zero;
+                _agent.transform.localPosition = Vector3.zero;
+            }
         }
     }
 

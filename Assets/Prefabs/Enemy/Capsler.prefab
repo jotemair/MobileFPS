@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 507573011668231818}
   - component: {fileID: 507573011668231861}
   - component: {fileID: 507573011668231860}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Head
   m_TagString: Target
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 507573011849050506}
   - component: {fileID: 507573011849050549}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Capsler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,7 +230,7 @@ GameObject:
   - component: {fileID: 507573013085044634}
   - component: {fileID: 507573013085044613}
   - component: {fileID: 507573013085044612}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Body
   m_TagString: Target
   m_Icon: {fileID: 0}

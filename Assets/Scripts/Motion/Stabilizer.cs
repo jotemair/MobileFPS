@@ -1,17 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public enum StabilizationAxes
-{
-    X,
-    Y,
-    Z,
-};
+using UnityEngine.Assertions;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Stabilizer : MonoBehaviour
 {
+    public enum Axes
+    {
+        X,
+        Y,
+        Z,
+        None,
+    };
+
     [SerializeField]
     private float _strength = 1f;
 
@@ -22,7 +24,10 @@ public class Stabilizer : MonoBehaviour
     private Vector3 _stabilizationDirection = new Vector3(0f, 1f, 0f);
 
     [SerializeField]
-    private StabilizationAxes _axis = StabilizationAxes.Y;
+    private Axes _axis = Axes.Y;
+
+    [SerializeField]
+    private Axes _stabilizationAxisLock = Axes.None;
 
     private Rigidbody _rb = null;
 
@@ -46,10 +51,20 @@ public class Stabilizer : MonoBehaviour
         set { _stabilizationDirection = value.normalized; }
     }
 
-    public StabilizationAxes Axis
+    public Axes Axis
     {
         get { return _axis; }
-        set { _axis = value; }
+        set
+        {
+            Assert.IsTrue(Axes.None != _axis, "Stabilization axis cannot be NONE");
+            _axis = value;
+        }
+    }
+
+    public Axes StabilizationAxisLock
+    {
+        get { return _stabilizationAxisLock; }
+        set { _stabilizationAxisLock = value; }
     }
 
     public void OnDrawGizmos()
@@ -59,13 +74,13 @@ public class Stabilizer : MonoBehaviour
 
         switch (_axis)
         {
-            case StabilizationAxes.X:
+            case Axes.X:
                 Gizmos.color = Color.red;
                 break;
-            case StabilizationAxes.Y:
+            case Axes.Y:
                 Gizmos.color = Color.green;
                 break;
-            case StabilizationAxes.Z:
+            case Axes.Z:
                 Gizmos.color = Color.blue;
                 break;
         }
@@ -75,6 +90,7 @@ public class Stabilizer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Axis = _axis;
         _rb = GetComponent<Rigidbody>();
         StabilizationDirection = _stabilizationDirection;
     }
@@ -89,6 +105,21 @@ public class Stabilizer : MonoBehaviour
         if (Mathf.Approximately(angleDiff, 90f) || Mathf.Approximately(angleDiff, 180f) || Mathf.Approximately(angleDiff, 270f))
         {
             axisVector = transform.TransformDirection(GetAxis() + new Vector3(0.01f, 0.01f, 0.01f)).normalized;
+        }
+
+        switch (_stabilizationAxisLock)
+        {
+            case (Axes.X):
+                axisVector = new Vector3(0f, axisVector.y, axisVector.z).normalized;
+                break;
+            case (Axes.Y):
+                axisVector = new Vector3(axisVector.x, 0f, axisVector.z).normalized;
+                break;
+            case (Axes.Z):
+                axisVector = new Vector3(axisVector.x, axisVector.y, 0f).normalized;
+                break;
+            default:
+                break;
         }
 
         if (angleDiff > _breakAngle)
@@ -126,13 +157,13 @@ public class Stabilizer : MonoBehaviour
 
         switch (_axis)
         {
-            case StabilizationAxes.X:
+            case Axes.X:
                 axis = Vector3.right;
                 break;
-            case StabilizationAxes.Y:
+            case Axes.Y:
                 axis = Vector3.up;
                 break;
-            case StabilizationAxes.Z:
+            case Axes.Z:
                 axis = Vector3.forward;
                 break;
         }
