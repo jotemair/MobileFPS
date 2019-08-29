@@ -108,17 +108,15 @@ public class DirectionalJoint : MonoBehaviour
             springDelta = springVector.normalized * springStrain;
         }
 
+        _rb.AddForceAtPosition(springDelta * _spring, anchorPosition());
+        if (null != _connectedRb)
+        {
+            _connectedRb.AddForceAtPosition(-springDelta * _spring, connectedAnchorPosition());
+        }
+
         if ((springDelta * _spring).magnitude > _breakForce)
         {
             Destroy(this);
-        }
-        else
-        {
-            _rb.AddForceAtPosition(springDelta * _spring, anchorPosition());
-            if (null != _connectedRb)
-            {
-                _connectedRb.AddForceAtPosition(-springDelta * _spring, connectedAnchorPosition());
-            }
         }
     }
 }

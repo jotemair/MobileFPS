@@ -41,6 +41,9 @@ public class EnemyController : MonoBehaviour
 
     private bool _isAlive = true;
 
+    [SerializeField]
+    private List<Appendage> _appendages = new List<Appendage>();
+
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
@@ -77,6 +80,11 @@ public class EnemyController : MonoBehaviour
             _head.GetComponent<Renderer>().material = _deadMat;
 
             _isAlive = false;
+
+            foreach (var appendage in _appendages)
+            {
+                appendage.Die();
+            }
         }
 
         return;
@@ -107,9 +115,9 @@ public class EnemyController : MonoBehaviour
         {
             _agent.SetDestination(_target.transform.position);
 
-            float avoidDist = Vector3.Scale(_agent.transform.localPosition, Vector3.right + Vector3.forward).magnitude;
+            float avoidDist = Vector3.Scale(_agent.transform.position - _body.transform.position, Vector3.right + Vector3.forward).magnitude;
 
-            if ((avoidDist < _avoidTreshold) && (_agent.path.corners.Length > 1))
+            if (_agent.path.corners.Length > 1)
             {
                 _directionVector = Vector3.Scale(_agent.path.corners[1] - _body.transform.position, Vector3.right + Vector3.forward).normalized;
                 _bodyLookStabilizer.StabilizationDirection = _directionVector;
@@ -127,9 +135,9 @@ public class EnemyController : MonoBehaviour
                 {
                     _directionVector = Vector3.zero;
                 }
-
-                _agent.transform.localPosition = Vector3.zero;
             }
+
+            _agent.transform.position = _body.transform.position;
         }
     }
 
