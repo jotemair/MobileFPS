@@ -105,7 +105,7 @@ MonoBehaviour:
   _deadMat: {fileID: 2100000, guid: d1f716d655503ff4e984f77926053e67, type: 2}
   _target: {fileID: 0}
   _agent: {fileID: 5271760873103263559}
-  _avoidTreshold: 0.1
+  _avoidTreshold: 0.2
 --- !u!1 &7724278997486278520
 GameObject:
   m_ObjectHideFlags: 0

@@ -111,14 +111,23 @@ public class EnemyController : MonoBehaviour
 
             if ((avoidDist < _avoidTreshold) && (_agent.path.corners.Length > 1))
             {
-                _directionVector = (_agent.path.corners[1] - _body.transform.position);
-                _directionVector = new Vector3(_directionVector.x, 0f, _directionVector.z).normalized;
+                _directionVector = Vector3.Scale(_agent.path.corners[1] - _body.transform.position, Vector3.right + Vector3.forward).normalized;
                 _bodyLookStabilizer.StabilizationDirection = _directionVector;
                 _headLookStabilizer.StabilizationDirection = _directionVector;
             }
             else
             {
-                _directionVector = Vector3.zero;
+                Vector3 toTarget = _target.transform.position - _body.transform.position;
+                _directionVector = Vector3.Scale(toTarget, Vector3.right + Vector3.forward).normalized;
+                _bodyLookStabilizer.StabilizationDirection = _directionVector;
+                _headLookStabilizer.StabilizationDirection = _directionVector;
+
+                RaycastHit hit;
+                if ((toTarget.magnitude < 1f) || (Physics.Raycast(_body.transform.position, _body.transform.TransformDirection(Vector3.forward), out hit, 0.5f, LayerMask.GetMask("Enemy"))))
+                {
+                    _directionVector = Vector3.zero;
+                }
+
                 _agent.transform.localPosition = Vector3.zero;
             }
         }
