@@ -69,9 +69,6 @@ public class Stabilizer : MonoBehaviour
 
     public void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + delta);
-
         switch (_axis)
         {
             case Axes.X:
@@ -85,6 +82,12 @@ public class Stabilizer : MonoBehaviour
                 break;
         }
         Gizmos.DrawLine(transform.position, transform.position + (_stabilizationDirection / 2f));
+    }
+
+    public void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        //Gizmos.DrawLine(transform.position, transform.position + delta);
     }
 
     // Start is called before the first frame update

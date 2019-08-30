@@ -33,6 +33,7 @@ public class Appendage : MonoBehaviour
             _isAlive = false;
 
             Destroy(this);
+            Destroy(gameObject, 30f);
         }
 
         return;

@@ -93,9 +93,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _blastRadius: 3
-  _power: 7000
+  _power: 6000
   _firingForce: 150
-  _detectiontRadius: 1
   _timer: 3
 --- !u!54 &7362288882077426007
 Rigidbody:

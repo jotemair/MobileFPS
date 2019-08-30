@@ -41,6 +41,15 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private List<Appendage> _appendages = new List<Appendage>();
 
+    private Spawner _spawn = null;
+
+    public Spawner Spawn
+    {
+        get { return _spawn; }
+        set { _spawn = value; }
+    }
+
+
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
@@ -84,6 +93,12 @@ public class EnemyController : MonoBehaviour
             }
 
             Destroy(this);
+            Destroy(gameObject, 30f);
+
+            if (null !=_spawn)
+            {
+                _spawn.Enemies = _spawn.Enemies - 1;
+            }
         }
 
         return;
@@ -101,6 +116,11 @@ public class EnemyController : MonoBehaviour
         _headLookStabilizer = ((Stabilizer.Axes.Z == headStabilizers[0].Axis) ? headStabilizers[0] : headStabilizers[1]);
 
         _neck = _head.GetComponent<DirectionalJoint>();
+
+        if (null == _target)
+        {
+            _target = FindObjectOfType<PlayerControls>().gameObject;
+        }
     }
 
     // Update is called once per frame
