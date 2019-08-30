@@ -31,7 +31,11 @@ public class Appendage : MonoBehaviour
             }
 
             _isAlive = false;
+
+            Destroy(this);
         }
+
+        return;
     }
 
     public void Update()

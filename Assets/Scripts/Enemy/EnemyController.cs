@@ -34,9 +34,6 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private NavMeshAgent _agent = null;
 
-    [SerializeField]
-    private float _avoidTreshold = 0.5f;
-
     private Vector3 _directionVector = Vector3.zero;
 
     private bool _isAlive = true;
@@ -85,6 +82,8 @@ public class EnemyController : MonoBehaviour
             {
                 appendage.Die();
             }
+
+            Destroy(this);
         }
 
         return;

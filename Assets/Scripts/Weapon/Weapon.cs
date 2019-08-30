@@ -15,10 +15,21 @@ public class Weapon : MonoBehaviour
     private ParticleSystem _projectile = null;
 
     [SerializeField]
+    private GameObject _secondary = null;
+
+    [SerializeField]
     private Transform _cam = null;
 
     [SerializeField]
     private float _rotationSlerpRate = 2f;
+
+    public void FireSecondary()
+    {
+        if (null !=_secondary)
+        {
+            Instantiate(_secondary, transform.position, transform.rotation);
+        }
+    }
 
     public void OnDrawGizmos()
     {
