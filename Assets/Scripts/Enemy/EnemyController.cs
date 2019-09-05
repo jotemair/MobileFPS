@@ -68,7 +68,7 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void Die()
+    public void Die()
     {
         if (_isAlive)
         {
@@ -93,12 +93,14 @@ public class EnemyController : MonoBehaviour
             }
 
             Destroy(this);
-            Destroy(gameObject, 30f);
+            Destroy(gameObject, (3000f / (100f + GameManager.Instance.GameTime)));
 
             if (null !=_spawn)
             {
                 _spawn.Enemies = _spawn.Enemies - 1;
             }
+
+            GameManager.Instance.AddKill();
         }
 
         return;

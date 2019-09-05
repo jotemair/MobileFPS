@@ -16,10 +16,14 @@ public class Bomb : MonoBehaviour
     [SerializeField]
     private float _timer = 1f;
 
+    [SerializeField]
+    private ParticleSystem _effect = null;
+
+    private bool _hasExploded = false;
+
     public void Start()
     {
         GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * _firingForce, ForceMode.Impulse);
-        Invoke("Explode", _timer);
     }
 
     public void OnCollisionEnter(Collision collision)
@@ -40,21 +44,44 @@ public class Bomb : MonoBehaviour
 
     void Explode()
     {
-        Vector3 explosionPos = transform.position;
-        Collider[] colliders = Physics.OverlapSphere(explosionPos, _blastRadius);
-        foreach (Collider hit in colliders)
+        if (!_hasExploded)
         {
-            if (hit.CompareTag("Target"))
-            {
-                Rigidbody rb = hit.GetComponent<Rigidbody>();
 
-                if (null != rb)
+            Vector3 explosionPos = transform.position;
+            Collider[] colliders = Physics.OverlapSphere(explosionPos, _blastRadius);
+            foreach (Collider hit in colliders)
+            {
+                if (hit.CompareTag("Target"))
                 {
-                    rb.AddExplosionForce(_power, explosionPos, _blastRadius, 3.0F);
+                    Rigidbody rb = hit.GetComponent<Rigidbody>();
+
+                    if (null != rb)
+                    {
+                        rb.AddExplosionForce(_power, explosionPos, _blastRadius, 0.0f, ForceMode.Impulse);
+                    }
                 }
             }
-        }
 
-        Destroy(gameObject);
+            _hasExploded = true;
+            if (null != _effect)
+            {
+                _effect.Play();
+            }
+            GetComponent<Renderer>().enabled = false;
+            Destroy(gameObject, 1f);
+        }
+    }
+
+    public void Update()
+    {
+        if (!_hasExploded)
+        {
+            List<Collider> colliders = new List<Collider>(Physics.OverlapSphere(transform.position, _blastRadius));
+            Collider hit = colliders.Find(x => (x.CompareTag("Target") && (null != x.transform.parent.GetComponent<EnemyController>())));
+            if (null != hit)
+            {
+                Invoke("Explode", _timer);
+            }
+        }
     }
 }

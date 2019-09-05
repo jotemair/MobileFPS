@@ -34,27 +34,29 @@ public class Spawner : MonoBehaviour
     void Start()
     {
         _spawnLocations = new List<Transform>(GetComponentsInChildren<Transform>());
-        SpawnX(10);
     }
 
     // Update is called once per frame
     void Update()
     {
-        _spawnTimer = Mathf.Max(0f, _spawnTimer - Time.deltaTime);
-
-        if (0f == _spawnTimer)
+        if (GameManager.GameStates.Game == GameManager.Instance.GameState)
         {
-            _spawnTimer = _spawnTime;
-            _spawnTime = _spawnTime * _spawnSpeedup;
+            _spawnTimer = Mathf.Max(0f, _spawnTimer - Time.deltaTime);
 
-            if (_spawnTime < 0.1f)
+            if (0f == _spawnTimer)
             {
-                _spawnTime = 0f;
-            }
+                _spawnTimer = _spawnTime;
+                _spawnTime = _spawnTime * _spawnSpeedup;
 
-            if (_currentEnemies < _maxEnemies)
-            {
-                SpawnX(2);
+                if (_spawnTime < 0.1f)
+                {
+                    _spawnTime = 0f;
+                }
+
+                if (_currentEnemies < _maxEnemies)
+                {
+                    SpawnX(2);
+                }
             }
         }
     }
@@ -71,7 +73,8 @@ public class Spawner : MonoBehaviour
         int spawned = 0;
         while (spawned < x)
         {
-            if (Spawn(_spawnLocations[nums[idx]], _enemies[Random.Range(0, _enemies.Count)]))
+            float hardModeChance = Mathf.Atan(GameManager.Instance.GameTime / 100f) * Random.Range(0f, 1f);
+            if (Spawn(_spawnLocations[nums[idx]], _enemies[Random.Range(0, _enemies.Count / 2) + (hardModeChance > 0.7f ? _enemies.Count / 2 : 0)]))
             {
                 ++spawned;
                 ++_currentEnemies;

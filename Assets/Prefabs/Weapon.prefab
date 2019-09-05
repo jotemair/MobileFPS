@@ -141,6 +141,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2359
   _projectile: {fileID: 3381160532407849610}
+  _secondary: {fileID: 7362288882077426013, guid: 7cf42cc747207784f8e3547f760cf637,
+    type: 3}
   _cam: {fileID: 0}
   _rotationSlerpRate: 2
 --- !u!1 &1390015231171413357
@@ -3705,7 +3707,7 @@ ParticleSystem:
     serializedVersion: 3
     type: 1
     collisionMode: 0
-    colliderForce: 200
+    colliderForce: 300
     multiplyColliderForceByParticleSize: 0
     multiplyColliderForceByParticleSpeed: 1
     multiplyColliderForceByCollisionAngle: 1
