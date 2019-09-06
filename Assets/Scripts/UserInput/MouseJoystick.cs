@@ -28,7 +28,7 @@ public class MouseJoystick : MonoBehaviour
 
     private bool _lockCursor = false;
 
-    private bool _isOnPC = true;
+    private bool _isOnPC = false;
 
     #endregion
 
@@ -38,8 +38,11 @@ public class MouseJoystick : MonoBehaviour
     {
         if ((Application.platform != RuntimePlatform.Android) && (Application.platform != RuntimePlatform.IPhonePlayer))
         {
+            _isOnPC = true;
+        }
+        else
+        {
             Destroy(this);
-            _isOnPC = false;
         }
 
         _joystick = GetComponent<Joystick>();
