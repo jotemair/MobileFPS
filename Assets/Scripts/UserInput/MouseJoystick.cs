@@ -41,11 +41,8 @@ public class MouseJoystick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            _lockCursor = !_lockCursor;
-            Cursor.lockState = (_lockCursor ? CursorLockMode.Locked : CursorLockMode.None);
-        }
+        _lockCursor = ((GameManager.Instance.GameState == GameManager.GameStates.Game) || (GameManager.Instance.GameState == GameManager.GameStates.Wipe)) ;
+        Cursor.lockState = (_lockCursor ? CursorLockMode.Locked : CursorLockMode.None);
 
         if (_lockCursor)
         {

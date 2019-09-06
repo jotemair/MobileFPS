@@ -41,6 +41,13 @@ public class PlayerControls : MonoBehaviour
 
     #region Functions
 
+    public void SetLookSpeed(float speed)
+    {
+        _pitchSpeed = speed;
+        _rotationSpeed = speed;
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -51,12 +58,6 @@ public class PlayerControls : MonoBehaviour
 
         _rigidbody = GetComponent<Rigidbody>();
         Assert.IsNotNull(_rigidbody, "Attach Rigidbody component to player");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void FixedUpdate()
