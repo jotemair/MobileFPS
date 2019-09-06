@@ -43,6 +43,7 @@ public class MouseJoystick : MonoBehaviour
     {
         _lockCursor = ((GameManager.Instance.GameState == GameManager.GameStates.Game) || (GameManager.Instance.GameState == GameManager.GameStates.Wipe)) ;
         Cursor.lockState = (_lockCursor ? CursorLockMode.Locked : CursorLockMode.None);
+        Cursor.visible = !_lockCursor;
 
         if (_lockCursor)
         {
