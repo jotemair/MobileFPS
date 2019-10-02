@@ -1,19 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class NavMeshHandler : MonoBehaviour
 {
-    // Start is called before the first frame update
     void Start()
     {
+        // Regenerate the Navmesh at the start
+        // Usefull in case dynamically generated levels are introduced
         GetComponent<NavMeshSurface>().BuildNavMesh();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

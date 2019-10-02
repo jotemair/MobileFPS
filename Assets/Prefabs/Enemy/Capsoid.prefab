@@ -185,7 +185,7 @@ MonoBehaviour:
   _strength: 3
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 1, z: 0}
-  _axis: 0
+  _stabilizationAxis: 0
   _stabilizationAxisLock: 3
 --- !u!114 &4709113338377600835
 MonoBehaviour:
@@ -202,7 +202,7 @@ MonoBehaviour:
   _strength: 1
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 0, z: 1}
-  _axis: 2
+  _stabilizationAxis: 2
   _stabilizationAxisLock: 3
 --- !u!114 &4709113338377600834
 MonoBehaviour:
@@ -224,6 +224,13 @@ MonoBehaviour:
   _directional: 1
   _minLengthRatio: 1
   _maxLengthRatio: 1
+  _anchorRotateX: 0
+  _anchorRotateY: 0
+  _anchorRotateZ: 0
+  _connectedAnchorRotateX: 0
+  _connectedAnchorRotateY: 0
+  _connectedAnchorRotateZ: 0
+  _damping: 0
 --- !u!1 &4709113339123443313
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,7 +357,7 @@ MonoBehaviour:
   _strength: 2
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 1, z: 0}
-  _axis: 1
+  _stabilizationAxis: 1
   _stabilizationAxisLock: 3
 --- !u!114 &4709113339123443314
 MonoBehaviour:
@@ -367,8 +374,8 @@ MonoBehaviour:
   _strength: 1
   _breakAngle: Infinity
   _stabilizationDirection: {x: 0, y: 0, z: 1}
-  _axis: 2
-  _stabilizationAxisLock: 3
+  _stabilizationAxis: 2
+  _stabilizationAxisLock: 1
 --- !u!1 &6473343630597497402
 GameObject:
   m_ObjectHideFlags: 0

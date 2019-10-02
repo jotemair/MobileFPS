@@ -1,10 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+// The Repulsor acts as a hover engine that produces force in a direction if it can push off something in the opposite direction
 [RequireComponent(typeof(Rigidbody))]
 public class Repulsor : MonoBehaviour
 {
+    #region Private Variables
+
     [SerializeField]
     private float _force = 100f;
 
@@ -24,7 +25,42 @@ public class Repulsor : MonoBehaviour
 
     private Vector3 repulsonVector = Vector3.zero;
 
-    public void OnDrawGizmos()
+    #endregion
+
+    #region MonoBehaviour Functions
+
+    private void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+        _axis = _axis.normalized;
+    }
+
+    private void FixedUpdate()
+    {
+        RaycastHit hit;
+
+        // If we can hit something in the defined direction within the given range that's part of the allowed layermask, we push off
+        if (Physics.Raycast(anchorPosition(), transform.TransformDirection(_axis), out hit, _maxDistance, _layerMask))
+        {
+            // The repulsion force increases as the hit point gets closer to the anchor
+
+            Vector3 hitVector = anchorPosition() - hit.point;
+            repulsonVector = hitVector.normalized * (_maxDistance - hitVector.magnitude);
+            Vector3 repulsonForce = repulsonVector * _force;
+
+            _rb.AddForce(repulsonForce);
+
+            // If the object we push off of also has a rigidbody, it will be effected by the repolsor as well
+            Rigidbody hitRB = hit.rigidbody;
+            if (null != hitRB)
+            {
+                hitRB.AddForceAtPosition(-repulsonForce, hit.point);
+            }
+        }
+    }
+
+    // Debug draw to show repulsor effect line, and forces
+    private void OnDrawGizmos()
     {
         Gizmos.color = new Color(0.25f, 0.25f, 0.5f);
         Gizmos.DrawSphere(anchorPosition(), 0.025f);
@@ -36,35 +72,15 @@ public class Repulsor : MonoBehaviour
         Gizmos.DrawLine(anchorPosition(), anchorPosition() + repulsonVector);
     }
 
+    #endregion
+
+    #region Private Functions
+
+    // Helper function to get the world space anchor position from local space coordinates
     private Vector3 anchorPosition()
     {
         return (transform.TransformPoint(_anchor));
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        _rb = GetComponent<Rigidbody>();
-        _axis = _axis.normalized;
-    }
-
-    void FixedUpdate()
-    {
-        RaycastHit hit;
-
-        if (Physics.Raycast(anchorPosition(), transform.TransformDirection(_axis), out hit, _maxDistance, _layerMask))
-        {
-            Vector3 hitVector = anchorPosition() - hit.point;
-            repulsonVector = hitVector.normalized * (_maxDistance - hitVector.magnitude);
-            Vector3 repulsonForce = repulsonVector * _force;
-
-            _rb.AddForce(repulsonForce);
-
-            Rigidbody hitRB = hit.rigidbody;
-            if (null != hitRB)
-            {
-                hitRB.AddForceAtPosition(-repulsonForce, hit.point);
-            }
-        }
-    }
+    #endregion
 }

@@ -5,6 +5,8 @@ using TMPro;
 
 public class PauseMenu : MonoBehaviour
 {
+    #region Private Variables
+
     [SerializeField]
     private TMP_Text _time = null;
 
@@ -20,14 +22,23 @@ public class PauseMenu : MonoBehaviour
     [SerializeField]
     private TMP_Text _menuTitle = null;
 
+    #endregion
+
+    #region Private Functions
+
     private void SetupText()
     {
+        // Update the text in the Pause Menu with the current information
         int totalSeconds = (int)GameManager.Instance.GameTime;
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         _time.text = minutes.ToString() + " : " + seconds.ToString();
         _kills.text = "Kills: " + GameManager.Instance.Kills.ToString();
     }
+
+    #endregion
+
+    #region Public Functions
 
     public void OpenMenu()
     {
@@ -40,6 +51,7 @@ public class PauseMenu : MonoBehaviour
 
     public void OpenAsEndMenu()
     {
+        // The Game Over menu is actually the pause menu, just with a different title, and the resume button hidden
         _pauseMenu.SetActive(true);
         SetupText();
         _menuTitle.text = "Game Over";
@@ -69,4 +81,6 @@ public class PauseMenu : MonoBehaviour
             OpenMenu();
         }
     }
+
+    #endregion
 }

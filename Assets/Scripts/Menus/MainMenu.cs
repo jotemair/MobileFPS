@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MainMenu : MonoBehaviour
 {
+    #region Private Variables
+
     [SerializeField]
     private GameObject _startButton = null;
 
@@ -15,6 +15,10 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField]
     private GameObject _mobileHowTo = null;
+
+    #endregion
+
+    #region Public Functions
 
     public void OnStartButtonClicked()
     {
@@ -42,4 +46,6 @@ public class MainMenu : MonoBehaviour
         _pcHowTo.SetActive(false);
         _mobileHowTo.SetActive(false);
     }
+
+    #endregion
 }

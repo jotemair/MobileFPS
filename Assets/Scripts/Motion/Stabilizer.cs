@@ -1,11 +1,42 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 
+// The stabilizer is a component that tries to rotate the gameobject it's attached to in a certain orientation
+// Like how a spinning top tries to keep upright, the stabilizer tries to rotate one of the XYZ axis in a given direction
 [RequireComponent(typeof(Rigidbody))]
 public class Stabilizer : MonoBehaviour
 {
+    #region Private Variables
+
+    // The strength of the stabilizer
+    [SerializeField]
+    private float _strength = 1f;
+
+    // The break angle of the stabilizer, if the angle between the stabilization axis and direction is greater, the stabilizer breaks
+    // IMPROVEMENT: Add the option to set break torque
+    [SerializeField]
+    private float _breakAngle = float.PositiveInfinity;
+
+    // The world space direction the stabilizer tries to rotate the stabilization axis to
+    [SerializeField]
+    private Vector3 _stabilizationDirection = new Vector3(0f, 1f, 0f);
+
+    // The axis we are trying to stabilize
+    [SerializeField]
+    private Axes _stabilizationAxis = Axes.Y;
+
+    // We can lock to an axis to only allow rotation around that axis
+    [SerializeField]
+    private Axes _stabilizationAxisLock = Axes.None;
+
+    private Rigidbody _rb = null;
+
+    private Vector3 delta = Vector3.zero;
+
+    #endregion
+
+    #region Public Properties
+
     public enum Axes
     {
         X,
@@ -13,25 +44,6 @@ public class Stabilizer : MonoBehaviour
         Z,
         None,
     };
-
-    [SerializeField]
-    private float _strength = 1f;
-
-    [SerializeField]
-    private float _breakAngle = float.PositiveInfinity;
-
-    [SerializeField]
-    private Vector3 _stabilizationDirection = new Vector3(0f, 1f, 0f);
-
-    [SerializeField]
-    private Axes _axis = Axes.Y;
-
-    [SerializeField]
-    private Axes _stabilizationAxisLock = Axes.None;
-
-    private Rigidbody _rb = null;
-
-    private Vector3 delta = Vector3.zero;
 
     public float Strength
     {
@@ -51,14 +63,10 @@ public class Stabilizer : MonoBehaviour
         set { _stabilizationDirection = value.normalized; }
     }
 
-    public Axes Axis
+    public Axes StabilizationAxis
     {
-        get { return _axis; }
-        set
-        {
-            Assert.IsTrue(Axes.None != _axis, "Stabilization axis cannot be NONE");
-            _axis = value;
-        }
+        get { return _stabilizationAxis; }
+        set { _stabilizationAxis = value; }
     }
 
     public Axes StabilizationAxisLock
@@ -67,49 +75,35 @@ public class Stabilizer : MonoBehaviour
         set { _stabilizationAxisLock = value; }
     }
 
-    public void OnDrawGizmos()
-    {
-        switch (_axis)
-        {
-            case Axes.X:
-                Gizmos.color = Color.red;
-                break;
-            case Axes.Y:
-                Gizmos.color = Color.green;
-                break;
-            case Axes.Z:
-                Gizmos.color = Color.blue;
-                break;
-        }
-        Gizmos.DrawLine(transform.position, transform.position + (_stabilizationDirection / 2f));
-    }
+    #endregion
 
-    public void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        //Gizmos.DrawLine(transform.position, transform.position + delta);
-    }
+    #region MonoBehaviour Functions
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        Axis = _axis;
         _rb = GetComponent<Rigidbody>();
         StabilizationDirection = _stabilizationDirection;
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        Vector3 axisVector = transform.TransformDirection(GetAxis());
-        float angleDiff = Mathf.Abs(Vector3.Angle(axisVector, _stabilizationDirection));
-
-        // The math breaks down when the angle difference is exactly 90 degrees which can happen when something is laying on a surface
-        if (Mathf.Approximately(angleDiff, 90f) || Mathf.Approximately(angleDiff, 180f) || Mathf.Approximately(angleDiff, 270f))
+        if (Axes.None == _stabilizationAxis)
         {
-            axisVector = transform.TransformDirection(GetAxis() + new Vector3(0.01f, 0.01f, 0.01f)).normalized;
+            // If the stabilization axis is set to none, then we're disabled
+            return;
         }
 
+        Vector3 axisVector = transform.TransformDirection(GetAxis(_stabilizationAxis));
+        float angleDiff = Mathf.Abs(Vector3.Angle(axisVector, _stabilizationDirection));
+
+        // The math breaks down when the angle difference is exactly a multiple of 90 degrees which can happen when something is laying on a surface
+        if (Mathf.Approximately(angleDiff, 90f) || Mathf.Approximately(angleDiff, 180f) || Mathf.Approximately(angleDiff, 270f))
+        {
+            axisVector = transform.TransformDirection(GetAxis(_stabilizationAxis) + new Vector3(0.01f, 0.01f, 0.01f)).normalized;
+        }
+
+        // Note that this bit of code is mathematically wrong, BUT it works for what it's used for in-game
+        // IMPROVEMENT : Figure out how to correctly do it
         switch (_stabilizationAxisLock)
         {
             case (Axes.X):
@@ -132,7 +126,7 @@ public class Stabilizer : MonoBehaviour
         else
         {
             // Torque is a Vector3 where the vector direction is the axis of rotation and the magnitude is the angular acceleration (in radian / sec^2)
-            // To get the direction of the torque, we need to get the cross product of the local and world up vectors, as the result will be perpendicular to both
+            // To get the direction of the torque, we need to get the cross product of the 'from' and 'to' vectors, as the result will be perpendicular to both
             Vector3 rotationalAxis = Vector3.Cross(axisVector, _stabilizationDirection);
 
             // The acceleration rate should depend on how far we are from the correct rotation, we can get the angle difference from the cross product
@@ -146,7 +140,7 @@ public class Stabilizer : MonoBehaviour
             Quaternion q = transform.rotation * _rb.inertiaTensorRotation;
             delta = q * Vector3.Scale(_rb.inertiaTensor, (Quaternion.Inverse(q) * angularAcc));
 
-            // The math should not break down, since the edge cases ate handled with an added perturbance, but just in case
+            // The math should not break down, since the edge cases are handled with an added perturbance, but just in case
             if (!float.IsNaN(delta.x) && !float.IsNaN(delta.y) && !float.IsNaN(delta.z))
             {
                 _rb.AddTorque(delta * _strength);
@@ -154,11 +148,40 @@ public class Stabilizer : MonoBehaviour
         }
     }
 
-    private Vector3 GetAxis()
+    private void OnDrawGizmos()
+    {
+        switch (_stabilizationAxis)
+        {
+            case Axes.X:
+                Gizmos.color = Color.red;
+                break;
+            case Axes.Y:
+                Gizmos.color = Color.green;
+                break;
+            case Axes.Z:
+                Gizmos.color = Color.blue;
+                break;
+        }
+        Gizmos.DrawLine(transform.position, transform.position + (_stabilizationDirection / 2f));
+    }
+
+    // Debug draw to show the axis around which we are currently rotating
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, (transform.position + delta).normalized * (2f - (1f / (delta.magnitude + 1f))));
+    }
+
+    #endregion
+
+    #region Private Functions
+
+    // Helper function to get the axis we are trying to stabilize
+    private Vector3 GetAxis(Axes targetAxis)
     {
         Vector3 axis = Vector3.zero;
 
-        switch (_axis)
+        switch (targetAxis)
         {
             case Axes.X:
                 axis = Vector3.right;
@@ -173,4 +196,6 @@ public class Stabilizer : MonoBehaviour
 
         return axis;
     }
+
+    #endregion
 }

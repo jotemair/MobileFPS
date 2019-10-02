@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Wipe : MonoBehaviour
 {
@@ -9,6 +7,7 @@ public class Wipe : MonoBehaviour
 
     public void DoWipe()
     {
+        // Runs a particle system effect and kills all enemies
         _effect.Play();
         foreach (var enemy in FindObjectsOfType<EnemyController>())
         {

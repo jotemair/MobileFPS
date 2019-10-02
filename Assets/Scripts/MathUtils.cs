@@ -9,24 +9,30 @@ public class MathUtils
         return ((((angleTo - angleFrom) + 180f) % 360f) - 180f);
     }
 
-    // Clamp an angle between 
+    // Clamp an angle between two values, taking into account overflow
     public static float ClampAngle(float value, float min, float max)
     {
-        float result = value % 360f;
+        // Take the modulo of the input, we add 720 and take modulo again so that the result is guaranteed to be positive
+        float result = ((value % 360f) + 720f) % 360f;
 
+        // Make sure that the min and max values are in the appropriate range
         Assert.IsTrue(-360f < min);
         Assert.IsTrue(max < 360f);
 
         float diff = max - min;
 
+        // Min should be less than max, so the difference should be positive, and the difference should be less than a full circle
         Assert.IsTrue(0f < diff);
         Assert.IsTrue(diff < 360f);
 
-        float shiftedValue = ((value - min) % 360f);
+        // We shift the value by min, so that we can clamp between 0 degrees and a positive value less than 360
+        float shiftedValue = (((value - min) % 360f) + 720f) % 360f;
 
+        // If the shifted value is greater than the difference between min and max, it's outside the clamping range
         if (shiftedValue > diff)
         {
-            if (((360f + max) / 2f) < shiftedValue)
+            // We check if the shifted value that's outside the clamp range is closer to 0 or diff on the circle
+            if (((360f + diff) / 2f) < shiftedValue)
             {
                 result = min;
             }
