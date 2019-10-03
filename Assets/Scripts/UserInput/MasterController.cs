@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 
 public class MasterController : Joystick
 {
-    #region SerialiseFields
+    #region Private Variables
 
     // Treshold before dynamic joystick anchor position moves
     [SerializeField]
@@ -13,15 +13,11 @@ public class MasterController : Joystick
     [SerializeField]
     private JoystickType _joystickType = JoystickType.Fixed;
 
-    #endregion
-
-    #region Variables
-
     private Vector2 _fixedPosition = Vector2.zero;
 
     #endregion
 
-    #region Properties
+    #region Public Properties
 
     // The move threshold of the dynamic joystick
     public float MoveTreshold

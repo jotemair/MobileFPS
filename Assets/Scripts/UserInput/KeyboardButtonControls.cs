@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
+// Class to connect a keyboard button press to an event
 public class KeyboardButtonControls : MonoBehaviour
 {
     [SerializeField]

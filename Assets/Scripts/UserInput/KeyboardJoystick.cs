@@ -3,7 +3,7 @@ using UnityEngine.Assertions;
 
 public class KeyboardJoystick : MonoBehaviour
 {
-    #region SerialiseFields
+    #region Private Variables
 
     // Speed of lerp for generated keyboard input vector values
     [SerializeField]
@@ -13,20 +13,16 @@ public class KeyboardJoystick : MonoBehaviour
     [SerializeField]
     private float _lerpTreshold = .2f;
 
-    #endregion
-
-    #region Variables
-
     // Internal reference to joystick component
     private Joystick _joystick = null;
 
-    // Bool to keep track of when zero input vector was sent. Input sending stops after, so mouse controls are possible again after keyboard is released
+    // Bool to keep track of when zero input vector was sent. Input sending stops after, so touch controls are possible again after keyboard is released
     private bool _sentZero = true;
     private Vector2 _lastInputVector = Vector2.zero;
 
     #endregion
 
-    #region Functions
+    #region MonoBehaviour Functions
 
     private void Start()
     {
@@ -34,8 +30,7 @@ public class KeyboardJoystick : MonoBehaviour
         Assert.IsNotNull(_joystick, "KeyboardJoystick component should be placed on a GameObject with a Joystick component");
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         // Get keyboard input vector
         Vector2 keyboardVector = new Vector2(UnityEngine.Input.GetAxis("Horizontal"), UnityEngine.Input.GetAxis("Vertical"));

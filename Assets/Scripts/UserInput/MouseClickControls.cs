@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
+// Class to connect a mouse click to an event for PC controls
 public class MouseClickControls : MonoBehaviour
 {
     public enum MouseButtons
@@ -15,9 +14,8 @@ public class MouseClickControls : MonoBehaviour
     [SerializeField]
     private MouseButtons _button = MouseButtons.Primary;
 
-    public UnityEvent clicked;
+    public UnityEvent clicked = null;
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown((int)_button))

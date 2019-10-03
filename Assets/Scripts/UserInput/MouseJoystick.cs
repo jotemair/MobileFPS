@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+// This class allows mouse input to be passed to a joystick
 public class MouseJoystick : MonoBehaviour
 {
-    #region SerialiseFields
+    #region Private Variables
 
     // Speed of lerp for generated keyboard input vector values
     [SerializeField]
@@ -14,10 +15,6 @@ public class MouseJoystick : MonoBehaviour
     // Treshold for applying lerp, set to float.MaxValue to disable
     [SerializeField]
     private float _lerpTreshold = .2f;
-
-    #endregion
-
-    #region Variables
 
     // Internal reference to joystick component
     private Joystick _joystick = null;
@@ -32,38 +29,41 @@ public class MouseJoystick : MonoBehaviour
 
     #endregion
 
-    #region Functions
+    #region MonoBehaviour Functions
 
     private void Start()
     {
+        // This might be excessive, but this script messes up controls on mobile, so I wanted to be absolutely sure it only runs on PC
         if ((Application.platform != RuntimePlatform.Android) && (Application.platform != RuntimePlatform.IPhonePlayer))
         {
             _isOnPC = true;
+            _joystick = GetComponent<Joystick>();
+            Assert.IsNotNull(_joystick, "KeyboardJoystick component should be placed on a GameObject with a Joystick component");
         }
         else
         {
+            enabled = false;
             Destroy(this);
         }
-
-        _joystick = GetComponent<Joystick>();
-        Assert.IsNotNull(_joystick, "KeyboardJoystick component should be placed on a GameObject with a Joystick component");
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        // Again, making absolutely usre it only runs on PC
         if (_isOnPC)
         {
+            // Lock the cursor and hide it if we are in 'game' mode
             _lockCursor = ((GameManager.Instance.GameState == GameManager.GameStates.Game) || (GameManager.Instance.GameState == GameManager.GameStates.Wipe));
             Cursor.lockState = (_lockCursor ? CursorLockMode.Locked : CursorLockMode.None);
             Cursor.visible = !_lockCursor;
 
+            // If the cursor is locked
             if (_lockCursor)
             {
                 // Get mouse input vector
                 Vector2 mouseVector = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
-                // When generated keyboard vector is over set distance away from previous value, lerp will be applied to smooth out input
+                // When generated mouse vector is over set distance away from previous value, lerp will be applied to smooth out input
                 if (Vector2.Distance(_lastInputVector, mouseVector) > _lerpTreshold)
                 {
                     mouseVector = Vector2.Lerp(_lastInputVector, mouseVector, Time.deltaTime * _lerpSpeed);

@@ -1,11 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerControls : MonoBehaviour
 {
-    #region SerializeFields
+    #region Private Variables
+
+    // Control is handled through Joystick, PC controls feed to the player control script through the Joystick script
 
     [SerializeField]
     private Joystick _movementControl = null;
@@ -19,6 +20,8 @@ public class PlayerControls : MonoBehaviour
     [SerializeField]
     private float _rotationSpeed = 100f;
 
+    // Pitch is handled by actually moving the head of the player character, to which the camera is attached
+
     [SerializeField]
     private Transform _pitchTransform = null;
 
@@ -31,45 +34,46 @@ public class PlayerControls : MonoBehaviour
     [SerializeField]
     private float _pitchMax = 100f;
 
-    #endregion
-
-    #region Variables
-
     private Rigidbody _rigidbody = null;
 
     #endregion
 
-    #region Functions
+    #region MonoBehaviour Functions
 
-    public void SetLookSpeed(float speed)
+    private void Start()
     {
-        _pitchSpeed = speed;
-        _rotationSpeed = speed;
-    }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
+        // Initial setup and checks
         Assert.IsNotNull(_movementControl, "Player needs movement controls");
         Assert.IsNotNull(_directionControl, "Player needs direction controls");
 
         Assert.IsNotNull(_pitchTransform, "Set pitch transform for player");
 
         _rigidbody = GetComponent<Rigidbody>();
-        Assert.IsNotNull(_rigidbody, "Attach Rigidbody component to player");
     }
 
-    public void FixedUpdate()
+    private void FixedUpdate()
     {
+        // Move the player by changing the velocity
         Vector3 movementInput = (new Vector3(_movementControl.Input.x, 0f, _movementControl.Input.y));
         _rigidbody.velocity = transform.TransformDirection(movementInput) * Time.deltaTime * _moveSpeed;
 
+        // Rotate the player based on the rotation input
         transform.Rotate(0f, _directionControl.Input.x * Time.deltaTime * _rotationSpeed, 0f);
 
+        // Calculate the new pitch value, and clamp it between the given range, then apply it to the head/camera
         float currentRotation = _pitchTransform.rotation.eulerAngles.x;
-        _pitchTransform.rotation = Quaternion.Euler(MathUtils.ClampAngle(currentRotation - _directionControl.Input.y * Time.deltaTime * _pitchSpeed, _pitchMin, _pitchMax), _pitchTransform.rotation.eulerAngles.y, 0f);
-        
+        float newRotation = MathUtils.ClampAngle(currentRotation - _directionControl.Input.y * Time.deltaTime * _pitchSpeed, _pitchMin, _pitchMax);
+        _pitchTransform.rotation = Quaternion.Euler(newRotation, _pitchTransform.rotation.eulerAngles.y, 0f);
+    }
+
+    #endregion
+
+    #region Public Functions
+
+    public void SetLookSpeed(float speed)
+    {
+        _pitchSpeed = speed;
+        _rotationSpeed = speed;
     }
 
     #endregion
